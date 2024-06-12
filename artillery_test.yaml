@@ -1,0 +1,9 @@
+config:
+  target: http://localhost:8000
+  phases:
+    - duration: 20
+      arrivalRate: 500
+scenarios:
+  - flow:
+      - get:
+          url: /api/v1/loose-diamonds

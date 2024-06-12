@@ -1,0 +1,195 @@
+
+const diamondSievesValueChecking = async (array1: string[], array2: string[]) => {
+  const filteredList = array1.filter((val) => !array2.includes(val));
+  const diamondSievesList: string[] = [];
+  const errorsArray: any[] = [];
+
+  for (const item of filteredList) {
+    const diamondSieve = item.replace(/m/g, '-').replace(/p/g, '+');
+    diamondSievesList.push(diamondSieve);
+  }
+
+  for (const sieveCode of diamondSievesList) {
+    const sieveFound = await DiamondSieves.findOne({ code: sieveCode });
+
+    if (!sieveFound || sieveFound.status !== 'active') {
+      errorsArray.push({ message: `${sieveCode} of diamond sieve is not in the Diamond Sieves List or Status is not active` });
+    }
+  }
+
+  return { errorsArray, diamondSievesList };
+};
+
+
+ if (diamondRate) {
+      diamondRate.title = title || diamondRate.title;
+      diamondRate.status = status || diamondRate.status;
+      diamondRate.shape = shape || diamondRate.shape;
+      diamondRate.diamondRateChart = jsonData.length !== 0 ? jsonData : diamondRate.diamondRateChart;
+      await diamondRate.save({ validateModifiedOnly: true });
+    }
+
+const updateData: Partial<IDiamondRateChart> = {
+      title: title || diamondRate.title,
+      status: status || diamondRate.status,
+      shape: shape || diamondRate.shape,
+      diamondRateChart: jsonData.length !== 0 ? jsonData : diamondRate.diamondRateChart,
+    };
+
+    await DiamondRate.updateOne({ _id: req.params.id }, updateData, {
+      runValidators: true,
+    });
+
+
+This part is metal rate chart update controller===============================
+
+const { title, base_price, description, pricelist, status } = req.body as TMetalRateUpdate;
+
+    const metalRateChart = await MetalRateChart.findOne({ _id: req.params.id });
+
+    if (!metalRateChart) {
+      return next(new ErrorHandler('Metal rate chart not found', 404));
+    }
+
+    metalRateChart.title = title || metalRateChart.title;
+    metalRateChart.base_price = base_price || metalRateChart.base_price;
+    metalRateChart.description = description || metalRateChart.description;
+    metalRateChart.status = status || metalRateChart.status;
+
+    if (pricelist && pricelist.length > 0) {
+      metalRateChart.clearRateChart();
+
+      const convertedPricelist = pricelist.map((pl: TPriceList) => {
+        const rate = calculateMetalRate(base_price, pl);
+        pl.rate = rate;
+        return pl;
+      });
+
+      metalRateChart.pricelist = convertedPricelist as IPriceList[];
+    }
+
+    await metalRateChart.save({ validateBeforeSave: true });
+
+    return res.status(200).json({ message: `Metal rate chart updated successfully.` });
+
+
+     if (shape) {
+    query.shape = shape;
+  }
+  if (color) {
+    query.color = color;
+  }
+  if (clarity) {
+    query.clarity = clarity;
+  }
+  if (cut) {
+    query.cut = cut;
+  }
+  if (polish) {
+    query.polish = polish;
+  }
+  if (symmetry) {
+    query.symmetry = symmetry;
+  }
+  if (fluroscent) {
+    query.fluroscent = fluroscent;
+  }
+  if (eye_clean) {
+    query.eye_clean = eye_clean;
+  }
+  if (certificate) {
+    query.certificate = certificate;
+  }
+
+
+Previous Loose Diamond Get Controller
+
+export const getAllLooseDiamonds = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { pageNumber, pageSize, max_carat, max_final_price, min_carat, min_final_price } = req.query as TLooseDiamondsParams;
+
+    const page = Number(pageNumber) || 1;
+    const sizeOfPage = Number(pageSize) || 10;
+
+    let query: any = {};
+
+    const count = await LooseDiamond.countDocuments();
+    const skipDoc = sizeOfPage * (page - 1);
+    const pages = Math.ceil(count / sizeOfPage);
+
+    // Array of properties to check
+    const propertiesToCheck = ['shape', 'color', 'clarity', 'cut', 'polish', 'symmetry', 'fluroscent', 'eye_clean', 'certificate'];
+
+    // Iterate over the properties and add to the query if present
+    propertiesToCheck.forEach((prop) => {
+      if (req.query[prop]) {
+        query[prop] = req.query[prop];
+      }
+    });
+
+    if (max_carat) {
+      query.carat = { $lte: Number(max_carat) };
+    }
+    if (max_final_price) {
+      query.final_price = { $lte: Number(max_final_price) };
+    }
+    if (min_carat) {
+      query.carat = { ...query.carat, $gte: Number(min_carat) };
+    }
+    if (min_final_price) {
+      query.final_price = { ...query.final_price, $gte: Number(min_final_price) };
+    }
+
+    const loose_diamonds = await LooseDiamond.find(query).skip(skipDoc).limit(sizeOfPage);
+
+    return res.status(200).json({ loose_diamonds, page, pages });
+  } catch (error) {
+    return next(new ErrorHandler(`${error}`, 500));
+  }
+});
+
+
+export const averageRatingAndTotalUser = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    let totalRating = 0;
+    const allReviews = await ProductReview.find({ product_id: req.params.product_id }).select('rating');
+
+    if (allReviews.length === 0) {
+      return res.status(200).json({ message: 'No reviews yet!', averageProductRating: 0, totalNumberOfUserRated: 0 });
+    }
+
+    for (const review of allReviews) {
+      totalRating += review.rating;
+    }
+
+    const totalNumberOfUserRated = allReviews.length;
+    const averageProductRating = totalRating / totalNumberOfUserRated;
+
+    return res.status(200).json({ averageProductRating, totalNumberOfUserRated });
+  } catch (error) {
+    return next(new ErrorHandler(`${error}`, 500));
+  }
+});
+
+
+export const averageRatingAndTotalUser = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    let totalRating = 0;
+    const allReviews = await ProductReview.find({ product_id: req.params.product_id }).select('rating');
+
+    if (allReviews.length === 0) {
+      return res.status(200).json({ message: 'No reviews yet!', averageProductRating: 0, totalNumberOfUserRated: 0 });
+    }
+
+    for (const review of allReviews) {
+      totalRating += review.rating;
+    }
+
+    const totalNumberOfUserRated = allReviews.length;
+    const averageProductRating = totalRating / totalNumberOfUserRated;
+
+    return res.status(200).json({ averageProductRating, totalNumberOfUserRated });
+  } catch (error) {
+    return next(new ErrorHandler(`${error}`, 500));
+  }
+});
